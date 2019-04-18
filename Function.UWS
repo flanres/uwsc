@@ -1,0 +1,91 @@
+PUBLIC WINDOW_NAME = "Use_uwsc_window_name"
+
+//Useful Function
+
+
+// Description : 引数のデータを決められた編集可能なボックスへ入力
+// DATA : input data
+PROCEDURE   EDIT_CMD_DATA(DATA)
+ 
+    SET_ID = GETID(WINDOW_NAME,"WindowsForms10.Window.")
+    //Need search control ID
+    SENDSTR( SET_ID, DATA, 25, TRUE, FALSE) 
+
+FEND
+
+// Description : UWSCからファイル内の文字列を検索して置換
+// FNAME : file name
+// DATA1 : 編集対象文字列
+// DATA1 : 変換文字列
+PROCEDURE   EDIT_FILE(FNAME, DATA1, DATA2)
+
+    FID = FOPEN(FNAME, F_READ or F_WRITE)
+    FOR LINE = 1 to FGET(FID, -1)
+    BUN = FGET(FID , LINE)
+    BUN = CHGMOJ(BUN , DATA1 , DATA2)
+    FPUT(FID , BUN , LINE)
+    NEXT
+    FCLOSE(FID)
+
+FEND
+
+// Description : GETSTRの第2引数に指定された編集可能なボックスを
+//               5秒単位で監視し差分がなければ0を返す
+// Use case    : ダウンロードやアップロードが完了したかどうか
+//               を確認する
+FUNCTION   CHECK_UPLOAD()
+ 
+    SET_ID = GETID(WINDOW_NAME,"WindowsForms10.Window.")
+    CLKITEM(SET_ID,"GEN", CLK_TAB)
+    CMP1 = GETSTR( SET_ID, 11, STR_EDIT)
+    SLEEP (5)
+    CMP2 = GETSTR( SET_ID, 11, STR_EDIT)
+
+    IF CMP1 = CMP2 THEN RESULT = 0 ELSE RESULT = 1
+
+FEND
+
+// Description : 外部プログラムをUESCからKILLする
+// WID         : Window ID
+PROCEDURE   EXIT_PROG(WID)
+
+CTRLWIN(WID, CLOSE)
+
+FEND
+
+// Description : 外部プログラムをUESCから実行する
+// EXE_PATH    : 実行プログラムPATH
+PROCEDURE   EXE_PROG(EXE_PATH)
+
+EXEC(EXE_PATH)
+
+FEND
+
+// Description : 現在時刻を取得する
+// RESULT      : Time
+FUNCTION   GET_TIME()
+GETTIME()
+TIME = ""+G_TIME_YY+""+G_TIME_MM2+""+G_TIME_DD2
+RESULT = TIME
+FEND
+
+// Description : 結果比較用関数 自由にカスタマイズする
+// check result data
+FUNCTION   CHECK_RESULT(WIN_ID, IN_DATA, NUM, ETYPE)
+IF ETYPE = 0 THEN
+    DATA = GETSTR(WIN_ID,NUM,STR_EDIT)
+ELSE
+    DATA = GETSTR(WIN_ID,NUM,STR_STATIC)
+ENDIF
+IF IN_DATA = DATA THEN RESULT = 0 ELSE RESULT = 1
+FEND
+
+FUNCTION   CHECK_RESULT_POS(WIN_ID, IN_DATA, NUM, ETYPE)
+IF ETYPE = 0 THEN
+    DATA = GETSTR(WIN_ID,NUM,STR_EDIT)
+ELSE
+    DATA = GETSTR(WIN_ID,NUM,STR_STATIC)
+ENDIF
+IF POS(IN_DATA, DATA) > 0 THEN RESULT = 0 ELSE RESULT = 1
+FEND
+

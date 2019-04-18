@@ -1,0 +1,9 @@
+
+// Description : ウィンドウ内の編集可能なボックスに
+//               割り当てられているControl IDを50まで検索する
+call Function.UWS
+STRID = GETID("Skype","Chrome_WidgetWin_1")
+FOR I = 1 to 50
+STR = GETSTR(STRID,I,STR_EDIT)
+MSGBOX(STR+":"+I)
+NEXT
